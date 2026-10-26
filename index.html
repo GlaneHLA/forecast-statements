@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Statements</title>
+<style>
+:root{--bg:#fff;--fg:#1f1f1f;--muted:#787774;--line:#e9e9e7;--line2:#d3d1cb;--head:#f7f6f3;--accent:#2e75cc;--accent-bg:#e8f0fb;--neg:#b3261e;--edit:#fffbe6;--hover:#f1f1ef;--shadow:0 1px 2px rgba(0,0,0,.06)}
+@media (prefers-color-scheme:dark){:root{--bg:#191919;--fg:#e6e6e6;--muted:#9b9a97;--line:#2f2f2f;--line2:#3f3f3f;--head:#202020;--accent:#5b9bf0;--accent-bg:#1d2b3f;--neg:#ff8a80;--edit:#2a2713;--hover:#242424}}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Helvetica,Arial,sans-serif}
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding:12px 16px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg);z-index:3}
+.co{font-weight:600;font-size:15px}.sel{appearance:none;border:1px solid var(--line2);background:var(--bg);color:var(--fg);border-radius:6px;padding:5px 28px 5px 9px;font:inherit;font-weight:500;cursor:pointer;background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:calc(100% - 14px) 13px,calc(100% - 9px) 13px;background-size:5px 5px;background-repeat:no-repeat}
+.seg{display:inline-flex;border:1px solid var(--line2);border-radius:6px;overflow:hidden}.seg button{border:0;background:transparent;color:var(--muted);padding:5px 10px;font:inherit;cursor:pointer}.seg button.on{background:var(--accent-bg);color:var(--accent);font-weight:600}
+.spacer{flex:1}.btn{border:1px solid var(--line2);background:var(--bg);color:var(--fg);border-radius:6px;padding:5px 11px;font:inherit;cursor:pointer}.btn:hover{background:var(--hover)}
+.status{color:var(--muted);font-size:12px;min-width:120px;text-align:right}
+.tabs{display:flex;gap:2px;padding:8px 16px 0;border-bottom:1px solid var(--line)}.tabs button{border:0;border-bottom:2px solid transparent;background:transparent;color:var(--muted);padding:7px 10px;font:inherit;font-weight:500;cursor:pointer;margin-bottom:-1px}.tabs button.on{color:var(--fg);border-bottom-color:var(--fg)}
+.years{display:flex;gap:4px;padding:10px 16px 0}.years button{border:1px solid var(--line2);background:var(--bg);color:var(--muted);border-radius:14px;padding:2px 10px;font:inherit;font-size:12px;cursor:pointer}.years button.on{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.wrap{padding:10px 16px 24px;overflow:auto}
+table{border-collapse:separate;border-spacing:0;min-width:100%;font-variant-numeric:tabular-nums}
+th,td{padding:5px 8px;border-bottom:1px solid var(--line);white-space:nowrap;text-align:right}
+th{background:var(--head);color:var(--muted);font-weight:500;font-size:12px;position:sticky;top:0;z-index:1}
+th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:var(--bg);z-index:2;min-width:220px;max-width:320px;overflow:hidden;text-overflow:ellipsis}
+th:first-child{background:var(--head);z-index:3}
+tr.sec td{color:var(--muted);font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;padding-top:14px;border-bottom-color:var(--line2)}
+tr.sub td{font-weight:600;border-top:1px solid var(--line2)}tr.total td{font-weight:700;border-top:2px solid var(--fg);border-bottom:0}
+tr.ind td:first-child{padding-left:22px}tr.dim td{color:var(--muted)}
+td.neg{color:var(--neg)}td.tot{background:var(--head);font-weight:600}
+td.cell{padding:0}td.cell input{width:100%;min-width:84px;border:0;background:transparent;color:inherit;font:inherit;text-align:right;padding:5px 8px;outline:0;border-radius:0}
+td.cell input:hover{background:var(--hover)}td.cell input:focus{background:var(--edit);box-shadow:inset 0 0 0 2px var(--accent)}td.cell input.saving{opacity:.5}
+td.cell input::placeholder{color:var(--line2)}
+.item{color:var(--fg)}.item small{color:var(--muted);margin-left:6px;font-size:11.5px}
+.empty{padding:40px 16px;color:var(--muted);text-align:center}
+.note{padding:6px 16px 0;color:var(--muted);font-size:12px}
+@media print{.top,.tabs,.years,.note{display:none}.wrap{padding:0;overflow:visible}body{font-size:11px}th,td{padding:3px 6px}th:first-child,td:first-child{position:static}h1.print{display:block!important;font-size:16px;margin:0 0 8px}}
+h1.print{display:none}
+</style></head><body>
+<div class="top">
+  <span class="co" id="co"></span>
+  <select class="sel" id="scn" title="Scenario"></select>
+  <div class="seg" id="view"><button data-v="monthly" class="on">Monthly</button><button data-v="annual">Annual</button></div>
+  <span class="spacer"></span>
+  <span class="status" id="status"></span>
+  <button class="btn" id="pdf">Download PDF</button>
+</div>
+<div class="tabs" id="tabs">
+  <button data-t="inputs">Inputs</button><button data-t="pl" class="on">Profit &amp; Loss</button><button data-t="bs">Balance Sheet</button><button data-t="cf">Cash Flow</button>
+</div>
+<div class="years" id="years"></div>
+<div class="note" id="note"></div>
+<div class="wrap"><h1 class="print" id="ptitle"></h1><div id="grid"></div></div>
+<script>
+const qs=new URLSearchParams(location.search);const T=qs.get('t');let S=qs.get('s');
+const API='https://soaazlygbdljhfucqasa.supabase.co/functions/v1/forecast-statements';
+const M=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+let D=null,tab='pl',view='monthly',year=0;
+const $=id=>document.getElementById(id);
+const fmt=(v,kind)=>{if(v==null||isNaN(v))return'';if(kind==='pct')return(Math.round(v*10)/10).toLocaleString()+'%';if(kind==='num')return Math.round(v).toLocaleString();const n=Math.round(v);return n<0?'('+Math.abs(n).toLocaleString()+')':n.toLocaleString()};
+const monthLabel=iso=>{const d=new Date(iso+'T00:00:00Z');return M[d.getUTCMonth()]+' '+String(d.getUTCFullYear()).slice(2)};
+const PL=[['sec','Revenue'],['ind','Revenue','revenue'],['ind','Direct costs','direct_costs'],['sub','Gross profit','gross_profit'],['dim ind','Gross margin %','gross_margin_pct','pct'],
+ ['sec','Operating expenses'],['ind','Salaries & wages','opex_labor'],['ind','Employee taxes & benefits','opex_burden'],['ind','Expenses','opex_expenses'],['ind','Amortization','opex_amortization'],['sub','Total operating expenses','total_opex'],
+ ['sub','Operating income','operating_income'],['ind','Interest expense','interest_expense'],['ind','Depreciation','depreciation'],['ind','Gain on sale of assets','gain_on_sale'],['ind','Income taxes','income_taxes'],
+ ['total','Net profit','net_profit'],['dim ind','Net profit margin %','net_profit_margin_pct','pct']];
+const BS=[['sec','Assets'],['ind','Cash','cash'],['ind','Accounts receivable','accounts_receivable'],['ind','Inventory','inventory'],['ind','Other current assets','other_current_assets'],['sub','Total current assets','total_current_assets'],
+ ['ind','Long-term assets','lt_assets_gross'],['ind','Accumulated depreciation','accumulated_depreciation'],['sub','Total long-term assets','total_lt_assets'],['total','Total assets','total_assets'],
+ ['sec','Liabilities & equity'],['ind','Accounts payable','accounts_payable'],['ind','Income taxes payable','income_tax_payable'],['ind','Sales taxes payable','sales_tax_payable'],['ind','Prepaid revenue','prepaid_revenue'],['ind','Short-term debt','short_term_debt'],['sub','Total current liabilities','total_current_liabilities'],
+ ['ind','Long-term debt','long_term_debt'],['sub','Total liabilities','total_liabilities'],['ind','Paid-in capital','paid_in_capital'],['ind','Retained earnings','retained_earnings'],['ind','Earnings','earnings'],['sub','Total equity','total_equity'],['total','Total liabilities & equity','total_liabilities_equity'],['dim ind','Balance check','balance_check']];
+const CF=[['sec','Operations'],['ind','Net profit','cf_net_profit'],['ind','Gain on sale (reversal)','cf_gain_reversal'],['ind','Depreciation & amortization','cf_depreciation_amortization'],['ind','Change in accounts receivable','cf_change_ar'],['ind','Change in inventory','cf_change_inventory'],['ind','Change in accounts payable','cf_change_ap'],['ind','Change in income tax payable','cf_change_income_tax'],['ind','Change in sales tax payable','cf_change_sales_tax'],['ind','Change in prepaid revenue','cf_change_prepaid'],['sub','Net cash from operations','cf_operations'],
+ ['sec','Investing'],['ind','Assets purchased or sold','cf_assets_purchased_sold'],['sub','Net cash from investing','cf_investing'],
+ ['sec','Financing'],['ind','Investments received','cf_investments_received'],['ind','Dividends & distributions','cf_distributions'],['ind','Change in short-term debt','cf_change_st_debt'],['ind','Change in long-term debt','cf_change_lt_debt'],['sub','Net cash from financing','cf_financing'],
+ ['sub','Cash at beginning of period','cash_beginning'],['ind','Net change in cash','net_change_cash'],['total','Cash at end of period','cash']];
+const BALANCE=new Set(BS.map(r=>r[2]).filter(Boolean).concat(['cash']));const PCT=new Set(['gross_margin_pct','net_profit_margin_pct']);
+const colsFor=()=>{const P=D.periods;const fys=[...new Set(P.map(p=>p.fyi))].sort((a,b)=>a-b);
+ if(view==='annual')return fys.map(f=>({label:'FY'+P.find(p=>p.fyi===f).fy,ps:P.filter(p=>p.fyi===f),annual:true,fyi:f}));
+ const ps=P.filter(p=>p.fyi===year);if(ps.length&&!ps[0].monthly)return[{label:'FY'+ps[0].fy,ps,annual:true,fyi:year}];
+ return ps.map(p=>({label:monthLabel(p.month),ps:[p],pi:p.pi}))};
+const agg=(col,key)=>{const rows=col.ps.map(p=>D.results.find(r=>r.period_index===p.pi)).filter(Boolean);if(!rows.length)return null;
+ if(PCT.has(key)){const rev=rows.reduce((a,r)=>a+ +r.revenue,0);const num=key==='gross_margin_pct'?rows.reduce((a,r)=>a+ +r.gross_profit,0):rows.reduce((a,r)=>a+ +r.net_profit,0);return rev?num/rev*100:0}
+ if(key==='cash_beginning')return +rows[0].cash_beginning;if(BALANCE.has(key))return +rows[rows.length-1][key];return rows.reduce((a,r)=>a+ +r[key],0)};
+function render(){if(!D)return;$('co').textContent=D.scenario.company_name;$('ptitle').textContent=D.scenario.company_name+' · '+D.scenario.name+' · '+({inputs:'Inputs',pl:'Profit & Loss',bs:'Balance Sheet',cf:'Cash Flow'})[tab];
+ const sc=$('scn');sc.innerHTML=D.scenarios.map(s=>'<option value="'+s.id+'"'+(s.id===D.scenario.id?' selected':'')+'>'+esc(s.name)+(s.is_default?' (default)':'')+'</option>').join('');
+ const fys=[...new Set(D.periods.map(p=>p.fyi))].sort((a,b)=>a-b);const Y=$('years');Y.style.display=view==='annual'?'none':'flex';
+ Y.innerHTML=fys.map(f=>'<button data-y="'+f+'"'+(f===year?' class="on"':'')+'>FY'+D.periods.find(p=>p.fyi===f).fy+'</button>').join('');
+ $('status').textContent=D.scenario.last_recalc_at?'Recalculated '+new Date(D.scenario.last_recalc_at).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'}):'';
+ document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===tab));document.querySelectorAll('#view button').forEach(b=>b.classList.toggle('on',b.dataset.v===view));
+ $('note').textContent=tab==='inputs'?'Type a number and press Enter or Tab. Blank clears the month. Each change saves to the scenario, recalculates, and appears in Notion\u2019s Monthly Values.':'';
+ $('grid').innerHTML=tab==='inputs'?renderInputs():renderStatement(tab==='pl'?PL:tab==='bs'?BS:CF)}
+function renderStatement(rows){const cols=colsFor();const showTotal=view==='monthly'&&cols.length>1;let h='<table><thead><tr><th></th>'+cols.map(c=>'<th>'+c.label+'</th>').join('')+(showTotal?'<th>FY total</th>':'')+'</tr></thead><tbody>';
+ const yearCol={ps:D.periods.filter(p=>p.fyi===year)};
+ for(const [cls,label,key,kind] of rows){h+='<tr class="'+cls+'"><td>'+esc(label)+'</td>';if(!key){h+=cols.map(()=>'<td></td>').join('')+(showTotal?'<td></td>':'');h+='</tr>';continue}
+  h+=cols.map(c=>{const v=agg(c,key);return'<td class="'+(v<0?'neg':'')+'">'+fmt(v,kind)+'</td>'}).join('');
+  if(showTotal){const v=agg(yearCol,key);h+='<td class="tot '+(v<0?'neg':'')+'">'+fmt(v,kind)+'</td>'}h+='</tr>'}
+ return h+'</tbody></table>'}
+function renderInputs(){if(!D.inputs.length)return'<div class="empty">No varying grids in this scenario yet.<br>Set an item\u2019s mode to Varying in Notion and its months will appear here.</div>';
+ const cols=colsFor();let h='<table><thead><tr><th>Item</th>'+cols.map(c=>'<th>'+c.label+'</th>').join('')+'</tr></thead><tbody>';const groups={revenue:'Revenue',direct_costs:'Direct costs',personnel:'Personnel',expenses:'Expenses',assets:'Assets',financing:'Financing',distributions:'Distributions',scenario:'Scenario'};let g='';
+ D.inputs.forEach((inp,i)=>{if(inp.table!==g){g=inp.table;h+='<tr class="sec"><td>'+groups[g]+'</td>'+cols.map(()=>'<td></td>').join('')+'</tr>'}
+  h+='<tr><td class="item">'+esc(inp.name)+'<small>'+esc(inp.label)+'</small></td>';
+  h+=cols.map(c=>{const v=c.annual?inp.years[c.fyi]:inp.months[c.pi];const key=c.annual?'fyi:'+c.fyi:'pi:'+c.pi;const kind=/pct|churn|rate|burden/.test(inp.field)?'pct':'num';
+   return'<td class="cell"><input inputmode="decimal" placeholder="\u2013" data-i="'+i+'" data-k="'+key+'" data-label="'+esc(c.label)+'" value="'+(v==null?'':(+v).toLocaleString())+'"></td>'}).join('');h+='</tr>'});
+ return h+'</tbody></table>'}
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+async function load(){const r=await fetch(API+'/data?s='+encodeURIComponent(S)+'&t='+encodeURIComponent(T));if(!r.ok){$('grid').innerHTML='<div class="empty">'+esc((await r.json()).error||'Could not load')+'</div>';return}D=await r.json();S=D.scenario.id;
+ const fys=[...new Set(D.periods.map(p=>p.fyi))];if(!fys.includes(year))year=fys[0]??0;render()}
+async function save(input){const inp=D.inputs[+input.dataset.i];const [kt,kv]=input.dataset.k.split(':');const raw=input.value.replace(/[,\s$%]/g,'');const val=raw===''?null:Number(raw);
+ if(val!=null&&!Number.isFinite(val)){input.value='';return}const prev=kt==='pi'?inp.months[kv]:inp.years[kv];if((prev??null)===val)return;
+ input.classList.add('saving');$('status').textContent='Saving\u2026';
+ const body={s:S,t:T,item_id:inp.item_id,field:inp.field,value:val,input:{name:inp.name,label:inp.label,field:inp.field,table:inp.table},period_label:input.dataset.label};if(kt==='pi')body.pi=+kv;else body.fyi=+kv;
+ const r=await fetch(API+'/cell',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});const j=await r.json();
+ if(!r.ok){$('status').textContent='Save failed';alert(j.error||'Save failed');input.classList.remove('saving');return}
+ D=j;render();$('status').textContent=j.mirror_error?'Saved (Notion row not updated)':'Saved \u00b7 '+new Date(D.scenario.last_recalc_at).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})}
+document.addEventListener('change',e=>{if(e.target.matches('td.cell input'))save(e.target)});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.matches('td.cell input')){e.preventDefault();const all=[...document.querySelectorAll('td.cell input')];const n=all[all.indexOf(e.target)+1];e.target.blur();if(n)n.focus()}});
+$('tabs').addEventListener('click',e=>{const b=e.target.closest('button');if(b){tab=b.dataset.t;render()}});
+$('view').addEventListener('click',e=>{const b=e.target.closest('button');if(b){view=b.dataset.v;render()}});
+$('years').addEventListener('click',e=>{const b=e.target.closest('button');if(b){year=+b.dataset.y;render()}});
+$('scn').addEventListener('change',e=>{S=e.target.value;history.replaceState(null,'',location.pathname+'?s='+S+'&t='+encodeURIComponent(T));load()});
+$('pdf').addEventListener('click',()=>window.print());
+load();
+</script></body></html>
